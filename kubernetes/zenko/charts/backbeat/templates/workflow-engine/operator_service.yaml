@@ -1,0 +1,25 @@
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    service.alpha.kubernetes.io/tolerate-unready-endpoints: "true"
+  {{- if .Values.serviceAnnotations }}
+{{ toYaml .Values.serviceAnnotations | indent 4 }}
+  {{- end }}
+  labels:
+    app: {{ template "backbeat.name" . }}-workflow-engine-operator
+    chart: {{ template "backbeat.chart" . }}
+    heritage: {{ .Release.Service }}
+    release: {{ .Release.Name }}
+{{- if .Values.extraLabels }}
+{{ toYaml .Values.extraLabels | indent 4 }}
+{{- end }}
+  name: {{ template "backbeat.fullname" . }}-workflow-engine-operator
+spec:
+  type: ClusterIP
+  ports:
+    - name: operator
+      port: 3001
+  selector:
+    app: {{ template "backbeat.name" . }}-workflow-engine-operator
+    release: {{ .Release.Name }}

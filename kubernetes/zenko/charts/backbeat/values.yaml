@@ -10,7 +10,7 @@ global:
 
 image:
   repository: zenko/backbeat
-  tag: 8.1.14
+  tag: 8.1.14-workflow-engine-arsenal-2bb0e17
   pullPolicy: IfNotPresent
 
 logging:
@@ -180,3 +180,25 @@ garbageCollector:
     nodeSelector: {}
     tolerations: []
     affinity: {}
+
+workflowEngine:
+  processor:
+    replicaCount: 1
+
+    resources: {}
+    nodeSelector: {}
+    tolerations: []
+    affinity: {}
+
+    image:
+      repository: registry.scality.com/sf-eng/workflow-engine-extension
+      tag: workflow-engine-25
+      pullPolicy: IfNotPresent
+
+  operator:
+    replicaCount: 1
+
+    image:
+      repository: registry.scality.com/sf-eng/workflow-engine-operator
+      tag: workflow-engine-20
+      pullPolicy: IfNotPresent

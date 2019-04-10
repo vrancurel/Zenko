@@ -14,6 +14,10 @@ env:
     value: "{{- printf "%s-%s" .Release.Name "backbeat-api" | trunc 63 | trimSuffix "-" -}}"
   - name: CRR_METRICS_PORT
     value: "8900"
+  - name: WE_OPERATOR_HOST
+    value: "{{- printf "%s-%s" .Release.Name "backbeat-workflow-engine-operator" | trunc 63 | trimSuffix "-" -}}"
+  - name: WE_OPERATOR_PORT
+    value: "3001"
   - name: LOG_LEVEL
     value: {{ .Values.logging.level }}
   - name: ENDPOINT

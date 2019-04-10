@@ -8,7 +8,7 @@
 nodeCount: &nodeCount 3
 
 ingress:
-  enabled: false
+  enabled: true 
   # Used to create an Ingress record.
   # This must match the 'cloudserver' 'endpoint', unless your client
   # supports different hostnames.
@@ -27,7 +27,7 @@ ingress:
 global:
   orbit:
     enabled: true
-    endpoint: https://api.zenko.io
+    endpoint: https://api-dev.private.zenko.io
     # When 'orbit.enabled' is 'true', these aren't used, please use
     # https://zenko.io to manage your deployment
   locationConstraints: {}
@@ -76,10 +76,10 @@ reporting:
 
 cloudserver:
   replicaCount: *nodeCount
-  replicaFactor: 10
+  replicaFactor: 1
   mongodb:
     replicas: *nodeCount
-  endpoint: zenko.local
+  endpoint: zenko.local,zenko-cloudserver.default.svc.cluster.local
   users: {}
     # accountName:
       # access:
@@ -95,23 +95,28 @@ backbeat:
       replicaFactor: 1
     statusProcessor:
       replicaCount: *nodeCount
+    enabled: true
   lifecycle:
     bucketProcessor:
       replicaCount: *nodeCount
     objectProcessor:
       replicaCount: *nodeCount
+    enabled: false
   garbageCollector:
     consumer:
       replicaCount: *nodeCount
-  ingestion:
     enabled: true
+  ingestion:
+    enabled: false
     consumer:
       replicaCount: *nodeCount
   mongodb:
     replicas: *nodeCount
+  workflowEngine:
+    enabled: true
 
 cosmos:
-  enabled: true
+  enabled: false
   ## Specify an existing storageClass to use
   # storageClass:
   rbac:
@@ -239,6 +244,9 @@ zenko-queue:
       partitions: *nodeCount
       replicationFactor: 3
     - name: backbeat-sanitycheck
+      partitions: 1
+      replicationFactor: 3
+    - name: backbeat-workflow-engine
       partitions: 1
       replicationFactor: 3
   persistence:

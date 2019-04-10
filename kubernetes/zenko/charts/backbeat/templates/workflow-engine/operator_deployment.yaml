@@ -1,0 +1,55 @@
+{{- if .Values.global.orbit.enabled -}}
+{{- if .Values.workflowEngine.enabled -}}
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: {{ template "backbeat.fullname" . }}-workflow-engine-operator
+  labels:
+    app: {{ template "backbeat.name" . }}-workflow-engine-operator
+    chart: {{ template "backbeat.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  replicas: {{ .Values.workflowEngine.operator.replicaCount }}
+  template:
+    metadata:
+      labels:
+        app: {{ template "backbeat.name" . }}-workflow-engine-operator
+        release: {{ .Release.Name }}
+    spec:
+      serviceAccountName: backbeat-workflow-engine-operator-service-account
+      containers:
+        - name: operator
+          image: "{{ .Values.workflowEngine.operator.image.repository }}:{{ .Values.workflowEngine.operator.image.tag }}"
+          imagePullPolicy: {{ .Values.workflowEngine.operator.image.pullPolicy }}
+          terminationMessagePolicy: FallbackToLogsOnError
+          ports:
+            - name: operator
+              containerPort: 3001
+          env:
+            - name: LOG_LEVEL
+              value: {{ .Values.logging.level }}
+            - name: MONGODB_HOSTS
+              value: "{{ template "backbeat.mongodb-hosts" . }}"
+            - name: MONGODB_RS
+              value: "{{ default "rs0" .Values.mongodb.replicaSet }}"
+            - name: REDIS_SENTINELS
+              value: "{{ template "backbeat.redis-hosts" . }}"
+            - name: REDIS_HA_NAME
+              value: "{{ .Values.redis.sentinel.name }}"
+            - name: NO_KUBE_MODE
+              value: "true"
+    {{- with .Values.workflowEngine.operator.nodeSelector }}
+      nodeSelector:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.workflowEngine.affinity }}
+      affinity:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.workflowEngine.tolerations }}
+      tolerations:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+{{- end -}}
+{{- end -}}
