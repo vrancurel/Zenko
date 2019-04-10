@@ -101,6 +101,8 @@ backbeat:
       replicaCount: *nodeCount
   mongodb:
     replicas: *nodeCount
+  workflowEngine:
+    enabled: true
 
 cosmos:
   enabled: true
@@ -230,6 +232,9 @@ zenko-queue:
       partitions: *nodeCount
       replicationFactor: 3
     - name: backbeat-sanitycheck
+      partitions: 1
+      replicationFactor: 3
+    - name: backbeat-workflow-engine
       partitions: 1
       replicationFactor: 3
   persistence:

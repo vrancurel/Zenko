@@ -1,0 +1,77 @@
+{{- if .Values.global.orbit.enabled -}}
+{{- if .Values.workflowEngine.enabled -}}
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: {{ template "backbeat.fullname" . }}-workflow-engine-processor
+  labels:
+    app: {{ template "backbeat.name" . }}-workflow-engine
+    chart: {{ template "backbeat.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  replicas: {{ .Values.workflowEngine.processor.replicaCount }}
+  template:
+    metadata:
+      labels:
+        app: {{ template "backbeat.name" . }}-workflow-engine
+        release: {{ .Release.Name }}
+    spec:
+      containers:
+        - name: workflow-engine-processor
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          terminationMessagePolicy: FallbackToLogsOnError
+          command: ["/usr/src/app/docker-entrypoint.sh"]
+          args: ["npm", "run", "workflow_engine_processor"]
+          env:
+            - name: REMOTE_MANAGEMENT_DISABLE
+              value: "{{- if .Values.global.orbit.enabled }}0{{- else }}1{{- end }}"
+            - name: KAFKA_HOSTS
+              value: "{{- printf "%s-zenko-queue:9092" .Release.Name | trunc 63 | trimSuffix "-" -}}"
+            - name: LOG_LEVEL
+              value: {{ .Values.logging.level }}
+            - name: EXTENSIONS_WE_TOPIC
+              value: backbeat-workflow-engine
+            - name: EXTENSIONS_WE_FISSION_ROUTER_HOST
+              value: "router.fission"
+            - name: EXTENSIONS_WE_FISSION_ROUTER_PORT
+              value: "80"
+            - name: EXTENSIONS_WE_S3_HOST
+              value: "{{- printf "%s-cloudserver" .Release.Name | trunc 63 | trimSuffix "-" -}}"
+            - name: EXTENSIONS_WE_S3_PORT
+              value: "80"
+            - name: MONGODB_HOSTS
+              value: "{{ template "backbeat.mongodb-hosts" . }}"
+            ## Borrowing replication service account for demo purposes ##
+            - name: EXTENSIONS_REPLICATION_SOURCE_AUTH_TYPE
+              value: service
+            - name: EXTENSIONS_REPLICATION_SOURCE_AUTH_ACCOUNT
+              value: service-replication
+          livenessProbe:
+            httpGet:
+              path: {{ .Values.health.path.liveness }}
+              port: {{ .Values.health.port }}
+          volumeMounts:
+            - name: workflow
+              mountPath: /usr/src/app/conf/workflows
+          resources:
+{{ toYaml .Values.workflowEngine.processor.resources | indent 12 }}
+    {{- with .Values.workflowEngine.processor.nodeSelector }}
+      nodeSelector:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.workflowEngine.processor.affinity }}
+      affinity:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.workflowEngine.processor.tolerations }}
+      tolerations:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+      volumes:
+        - name: workflow
+          configMap:
+            name: backbeat-workflow-configmap
+{{- end -}}
+{{- end -}}

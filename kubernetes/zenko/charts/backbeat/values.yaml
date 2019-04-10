@@ -9,8 +9,8 @@ global:
   replicationEndpoints: []
 
 image:
-  repository: zenko/backbeat
-  tag: 8.1.8
+  repository: vrancurel/backbeat
+  tag: workflow-engine-24
   pullPolicy: IfNotPresent
 
 logging:
@@ -171,3 +171,20 @@ garbageCollector:
     nodeSelector: {}
     tolerations: []
     affinity: {}
+
+workflowEngine:
+  processor:
+    replicaCount: 1
+
+    resources: {}
+    nodeSelector: {}
+    tolerations: []
+    affinity: {}
+
+  ui:
+    replicaCount: 1
+
+    image:
+      repository: vrancurel/workflow-ui
+      tag: 11
+      pullPolicy: IfNotPresent

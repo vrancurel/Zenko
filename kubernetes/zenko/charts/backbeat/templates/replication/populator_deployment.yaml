@@ -62,6 +62,9 @@ spec:
             httpGet:
               path: {{ .Values.health.path.liveness}}
               port: {{ .Values.health.port }}
+          volumeMounts:
+            - name: workflow
+              mountPath: /usr/src/app/conf/workflows
           resources:
 {{ toYaml .Values.replication.populator.resources | indent 12 }}
     {{- with .Values.replication.populator.nodeSelector }}
@@ -76,3 +79,7 @@ spec:
       tolerations:
 {{ toYaml . | indent 8 }}
     {{- end }}
+      volumes:
+        - name: workflow
+          configMap:
+            name: backbeat-workflow-configmap
