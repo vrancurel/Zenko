@@ -71,7 +71,7 @@ cloudserver:
   replicaFactor: 10
   mongodb:
     replicas: *nodeCount
-  endpoint: zenko.local
+  endpoint: zenko.local,zenko-cloudserver.default.svc.cluster.local
   users: {}
     # accountName:
       # access:

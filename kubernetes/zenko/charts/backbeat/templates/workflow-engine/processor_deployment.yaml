@@ -38,7 +38,7 @@ spec:
             - name: EXTENSIONS_WE_FISSION_ROUTER_PORT
               value: "80"
             - name: EXTENSIONS_WE_S3_HOST
-              value: "{{- printf "%s-cloudserver" .Release.Name | trunc 63 | trimSuffix "-" -}}"
+              value: "{{- printf "%s-cloudserver.default.svc.cluster.local" .Release.Name | trunc 63 | trimSuffix "-" -}}"
             - name: EXTENSIONS_WE_S3_PORT
               value: "80"
             - name: MONGODB_HOSTS

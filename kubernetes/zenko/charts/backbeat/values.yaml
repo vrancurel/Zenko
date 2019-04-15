@@ -10,7 +10,7 @@ global:
 
 image:
   repository: vrancurel/backbeat
-  tag: workflow-engine-24
+  tag: workflow-engine-25
   pullPolicy: IfNotPresent
 
 logging:
@@ -186,5 +186,5 @@ workflowEngine:
 
     image:
       repository: vrancurel/workflow-ui
-      tag: 11
+      tag: 12
       pullPolicy: IfNotPresent
