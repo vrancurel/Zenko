@@ -27,6 +27,10 @@ spec:
           env:
             - name: REMOTE_MANAGEMENT_DISABLE
               value: "{{- if .Values.global.orbit.enabled }}0{{- else }}1{{- end }}"
+            - name: ZOOKEEPER_AUTO_CREATE_NAMESPACE
+              value: "1"
+            - name: ZOOKEEPER_CONNECTION_STRING
+              value: "{{- printf "%s-zenko-quorum:2181" .Release.Name | trunc 63 | trimSuffix "-" -}}"
             - name: KAFKA_HOSTS
               value: "{{- printf "%s-zenko-queue:9092" .Release.Name | trunc 63 | trimSuffix "-" -}}"
             - name: LOG_LEVEL
