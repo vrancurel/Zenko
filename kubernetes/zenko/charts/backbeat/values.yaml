@@ -10,7 +10,7 @@ global:
 
 image:
   repository: vrancurel/backbeat
-  tag: workflow-engine-47
+  tag: workflow-engine-61
   pullPolicy: IfNotPresent
 
 logging:
